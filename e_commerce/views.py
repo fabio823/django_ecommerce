@@ -41,7 +41,7 @@ def login_page(request):
         "form": form
     }
     print("Usuário logado!!!")
-    #print(request.user.is_authentuicated)
+    print(request.user.is_authenticated)
 
     if form.is_valid():
         print(form.cleaned_data)
@@ -52,16 +52,16 @@ def login_page(request):
         #print(request.user.is_authenticated)
 
         if user is not None:
-            #print(request.user.is_authenticated)
             login(request, user)
             print("Login válido!!")
+            #print(request.user.is_authenticated)
             #Redireciona para uma página de sucesso
             return redirect("/")
         else:
             #Retorna uma mensagem de erro de login
             print("Login inválido...")
 
-        return render(request, "auth/login.html", context)
+    return render(request, "auth/login.html", context)
 
 User = get_user_model()
 def register_page(request):
@@ -79,4 +79,3 @@ def register_page(request):
         print(new_user)
 
     return render(request, "auth/register.html", context)
-    

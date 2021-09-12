@@ -2,6 +2,7 @@ from django import forms
 from django.forms.fields import CharField, EmailField
 from django.contrib.auth import get_user_model
 
+User = get_user_model()
 class ContactForm(forms.Form):
     nome_completo = forms.CharField(
         error_messages={"required":"Obrigatório o preenchimento do nome"},
@@ -43,21 +44,29 @@ class RegisterForm(forms.Form):
     username = forms.CharField()
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Confirm password', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Confirme a senha!!!', widget=forms.PasswordInput)
 
-def clean_username(self):
-    username = self.cleaned_data.get('username')
-    qs = User.objects.filter(email=email)
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        qs = User.objects.filter(username=username)
 
-    if qs.exists():
-        raise forms.ValidationError("Esse e-mail já existe... Tente outro!!!")
-    return email
+        if qs.exists():
+            raise forms.ValidationError("Esse usuário já existe... Escolha outro nome!!!")
+        return username
 
-def clean(self):
-    data = self.cleaned_data
-    password = self.cleaned_data.get('password')
-    password2 = self.cleaned_dfata.get('password2')
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        qs = User.objects.filter(email=email)
 
-    if password != password2:
-        raise forms.ValidationError("As senhas informadas devem ser iguais!!!")
-    return data
+        if qs.exists():
+            raise forms.ValidationError("Esse e-mail já existe... Tente outro!!!")
+        return email
+
+    def clean(self):
+        data = self.cleaned_data
+        password = self.cleaned_data.get('password')
+        password2 = self.cleaned_data.get('password2')
+
+        if password != password2:
+            raise forms.ValidationError("As senhas informadas devem ser iguais!!!")
+        return data
