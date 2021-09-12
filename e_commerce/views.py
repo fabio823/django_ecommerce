@@ -1,13 +1,17 @@
-from typing import ContextManager
+from django.contrib.auth import authenticate, login, get_user_model
 from django.http import HttpResponse
-from django.shortcuts import render
-from .forms import ContactForm
+from django.shortcuts import render, redirect
+from .forms import ContactForm, LoginForm, RegisterForm
 
 def home_page(request):
     context = {
         "title" : "Página Principal",
         "content" : "Bem-vindo à Página Principal..."
     }
+
+    if request.user.is_authenticated:
+        context["premium_content"] = "Você é um usuário Premium!!!"
+
     return render(request, "home_page.html", context)
 
 def about_page(request):
@@ -31,9 +35,48 @@ def contact_page(request):
     #    print(request.POST.get("nome_completo"))
     return render(request, "contact/view.html", context)
 
-    def clean_email(self):
-        email = self.cleaned_data.get("email")
+def login_page(request):
+    form = LoginForm(request.POST or None)
+    context = {
+        "form": form
+    }
+    print("Usuário logado!!!")
+    #print(request.user.is_authentuicated)
 
-        if not "gmail.com" in email:
-            raise forms.ValidationError("O e-mail deve ser do gmail.com")
-        return email
+    if form.is_valid():
+        print(form.cleaned_data)
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        user = authenticate(request, username=username, password=password)
+        print(user)
+        #print(request.user.is_authenticated)
+
+        if user is not None:
+            #print(request.user.is_authenticated)
+            login(request, user)
+            print("Login válido!!")
+            #Redireciona para uma página de sucesso
+            return redirect("/")
+        else:
+            #Retorna uma mensagem de erro de login
+            print("Login inválido...")
+
+        return render(request, "auth/login.html", context)
+
+User = get_user_model()
+def register_page(request):
+    form = RegisterForm(request.POST or None)
+    context = {
+        "form": form
+    }
+
+    if form.is_valid():
+        print(form.cleaned_data)
+        username = form.cleaned_data.get('username')
+        email = form.cleaned_data.get('email')
+        password = form.cleaned_data.get('password')
+        new_user = User.objects.create_user(username, email, password)
+        print(new_user)
+
+    return render(request, "auth/register.html", context)
+    
