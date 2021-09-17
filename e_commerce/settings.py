@@ -133,3 +133,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(os.path.join(BASE_DIR), "static_cdn", "media_root")
+print('='*30)
+print(MEDIA_ROOT)
+print('='*30)
