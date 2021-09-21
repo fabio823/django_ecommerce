@@ -1,3 +1,4 @@
+from django.http import Http404
 from typing import ContextManager
 from django.db.models import query
 from django.db.models.query import QuerySet
@@ -42,7 +43,15 @@ def product_detail_view(request, pk=None, *args, **kwargs):
     print('-'*30)
     #queryset = Product.objects.all()
     #instance = Product.objects.get(pk=pk) #Pega o ID do objeto
-    instance = get_object_or_404(Product, pk=pk)
+    #instance = get_object_or_404(Product, pk=pk)
+
+    qs = Product.objects.filter(id=pk)
+
+    if qs.count() == 1:
+        instance = qs.first
+    else:
+        raise Http404("Esse produto não existe...")
+
     context = {
         #'object_list': queryset
         'object': instance
